@@ -3,25 +3,23 @@ using namespace std;
 #define all(v) v.begin(), v.end()
 const int ms = 2e6+2;
 int trie[ms][52], link[ms], sz = 0;
-vector<int> terminal[ms];
 char txt[ms], pat[ms];
-bitset<1000> term[ms];
+int term[ms];
 
 inline int get(char c){
 	if(c >= 'a' && c <= 'z') return c-'a';
 	else return 26 + c - 'A';
 }
 
-void insert(int i){
-	int node = 0, tam = strlen(pat);
-	for(int j = 0; j < tam; j++){
-		char c = pat[j];
+void insert(string pat){
+	int node = 0;
+	for(auto c : pat){
 		if(trie[node][get(c)] == -1){
 			trie[node][get(c)] = ++sz;
 		}
 		node = trie[node][get(c)];
 	}
-	term[node][i] = 1;
+	term[node] += 1;
 }
 
 void build_links(){
@@ -39,45 +37,35 @@ void build_links(){
 			else{
 				link[to] = f;
 				q.push(to);
-				term[to] = term[to] | term[f];
+				term[to] += term[f];
 			}
 		}
 	}
 }
 
-bitset<1000> search(){
-	bitset<1000> ans;
-	int node = 0, tam = strlen(txt);
-	for(int i = 0; i < tam; i++){
-		char c = txt[i];
+int search(string &s){
+	int ans = 0;
+	int node = 0;
+	for(auto c : s){
 		node = trie[node][get(c)];
-		ans = ans | term[node];
+		ans += term[node];
 	}
 	return ans;
 }
 
 int main(){
+	ios::sync_with_stdio(0), cin.tie(0);
 	memset(trie, -1, sizeof trie);
-	scanf(" %s", txt);
+	string s;
+	cin >> s;
 	int q;
-	scanf("%d", &q);
-	int ans[q];
-	memset(ans, 0, sizeof ans);
+	cin >> q;
 	for(int i = 0; i < q; i++){
-		scanf(" %s", pat);
-		insert(i);
+		cin >> pat;
+		insert(pat);
 	}
 
 	build_links();
-	bitset<1000> v = search();
-	for(int i = 0; i < q; i++)
-		ans[i] = v[i];
-
-	for(int i = 0; i < q; i++){
-		if(ans[i])
-			printf("Y\n");
-		else
-			printf("N\n");
-	}
+	cout << search(s) << endl;
 	return 0;
 }

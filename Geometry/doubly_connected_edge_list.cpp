@@ -21,10 +21,15 @@ private:
 		vector<half_edge *> innerComp;
 	};
 public:
+	vector<vertex> vertexs;
+	vector<face> faces;
+	vector<half_edge> half_edges;
+
 	vertex *createVertex(pair<double, double> c, half_edge *e){
 		vertex *v = new vertex;
 		v->coord = c;
 		v->incidentEdge = e;
+		vertexs.push_back(*v);
 		return v;
 	}
 
@@ -50,6 +55,9 @@ public:
 		e1->incidentFace = e2->incidentFace = NULL;
 		e1->twin = e2;
 		e2->twin = e1;
+
+		half_edges.push_back(*e1);
+		half_edges.push_back(*e2);
 		return {e1, e2};
 	}
 
@@ -63,6 +71,8 @@ public:
 		}while(at != e);
 
 		f1->innerComp = v;
+
+		faces.push_back(*f1);
 		return f1;
 	}
 };

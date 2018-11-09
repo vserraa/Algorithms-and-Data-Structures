@@ -36,7 +36,29 @@ vector<int> build_sa(string s){
 		}
 	}
 
-	return c;
+	return p;
+}
+
+vector<int> build_lcp(string s, vector<int> &sa){
+	int n = s.size(), k = 0;
+	vector<int> rank(n), lcp(n-1);
+	for(int i = 0; i < n; i++)
+		rank[sa[i]] = i;
+
+	for(int i = 0; i < n; i++){
+		if(rank[i] == n-1){
+			k = 0; 
+			continue;
+		}
+
+		int j = sa[rank[i]+1];
+		while(i+k < n && j+k < n && s[i+k] == s[j+k]) k++;
+
+		lcp[rank[i]] = k;
+		if(k) k--;
+	}
+
+	return lcp;
 }
 
 int main(){
@@ -45,15 +67,17 @@ int main(){
 	cin >> s;
 	int n = s.size();
 
-	vector<int> cl = build_sa(s), sa(n);
-	//aqui cl é o vetor com as classes de equivalencia dos sufixos
-	//sa eh o proprio suffix array
-	for(int i = 0; i < n; i++){
-		sa[cl[i]] = i;
-		cout << cl[i] << " \n"[i == n-1];
-	}
+	vector<int> sa = build_sa(s);
 
 	for(int i = 0; i < n; i++)
 		cout << sa[i] << " \n"[i == n-1];
+
+	vector<int> lcp = build_lcp(s, sa);
+	for(int i = 0; i < n-1; i++)
+		cout << lcp[i] << " \n"[i == n-2];
+
+	/*sejam i e j duas posições nao necessariamente 
+	adjacentes no suffix array já ordenado, então 
+	LCP(i, j) = min(lcp[i], lcp[i+1], ..., lcp[j-1])*/
 	return 0;
 }

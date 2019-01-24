@@ -4,45 +4,68 @@ const int ms = 1e5+10;
 int a[ms];
 
 struct Vertex {
-	Vertex *l, *r;
-	int sum;
-	Vertex(int x): l(nullptr), r(nullptr), sum(x) {}
-	Vertex(Vertex *l, Vertex *r): l(l), r(r), sum(0) {
-		if(l) sum += l->sum;
-		if(r) sum += r->sum;
-	}
+    Vertex *l, *r;
+    int sum;
+    Vertex(): l(nullptr), r(nullptr), sum(0) {}
+    Vertex(int x): l(nullptr), r(nullptr), sum(x) {}
+    Vertex(Vertex *l, Vertex *r): l(l), r(r), sum(0) {
+        if(l) sum += l->sum;
+        if(r) sum += r->sum;
+    }
 };
 
+int cc = 0;
+Vertex buffer[ms * 20];
+
+Vertex* createNode() {
+	return &buffer[cc++];
+}
+ 
+vector<Vertex*> roots;
+ 
 Vertex* build(int l, int r) {
-	if(l == r)
-		return new Vertex(a[l]);
-
-	int mid = (l+r)/2;
-	return new Vertex(build(l, mid), build(mid+1, r));
+    if(l == r) {
+    	Vertex* ans = createNode();
+    	*ans = Vertex(a[l]);
+        return ans;
+    }
+ 
+    int mid = (l+r)/2;
+    Vertex* ans = createNode();
+    *ans = Vertex(build(l, mid), build(mid+1, r));
+    return ans;
 }
-
+ 
 int query(Vertex *node, int ql, int qr, int l, int r){
-	if(ql > r || qr < l)
-		return 0;
-
-	if(l >= ql && r <= qr)
-		return node->sum;
-
-	int mid = (l+r)/2;
-	return query(node->l, ql, qr, l, mid) + 
-		query(node->r, ql, qr, mid+1, r);
+    if(ql > r || qr < l)
+        return 0;
+ 
+    if(l >= ql && r <= qr)
+        return node->sum;
+ 
+    int mid = (l+r)/2;
+    return query(node->l, ql, qr, l, mid) + 
+        query(node->r, ql, qr, mid+1, r);
 }
-
+ 
 Vertex* update(Vertex *node, int tgt, int newVal, int l, int r){
-	if(l == r){
-		return new Vertex(node->sum + newVal);
-	}
-
-	int mid = (l+r)/2;
-	if(tgt <= mid)
-		return new Vertex(update(node->l, tgt, newVal, l, mid), node->r);
-	else
-		return new Vertex(node->l, update(node->r, tgt, newVal, mid+1, r));
+    if(l == r){
+    	Vertex *ans = createNode();
+    	*ans = Vertex(node->sum + newVal);
+    	return ans;
+    }
+ 
+    int mid = (l+r)/2;
+    if(tgt <= mid){
+    	Vertex *ans = createNode();
+    	*ans = Vertex(update(node->l, tgt, newVal, l, mid), node->r);
+    	return ans;
+    }
+    else{
+    	Vertex *ans = createNode();
+    	*ans = Vertex(node->l, update(node->r, tgt, newVal, mid+1, r));
+    	return ans;
+    }
 }
 
 int main(){
@@ -57,7 +80,6 @@ int main(){
 	int q;
 	cin >> q;
 	while(q--){
-		//cout << q << endl;
 		int op;
 		cin >> op;
 		if(op == 2){

@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 const int ms = 2e5+10;
-int a[ms], c[ms], a1[ms], c1[ms], head[ms], ra[ms];
+int a[ms], c[ms], a1[ms], c1[ms], head[ms], lcp[ms], ra[ms];
 
 //magic suffix array by Andrew Stankevich O(nlogn)
 void build_sa(string s){
@@ -52,12 +52,39 @@ void build_sa(string s){
 	}
 }
 
+void build_lcp(string s){
+	int n = s.size();
+	for(int i = 0; i < n; i++)
+		ra[a[i]] = i;
+
+	int z = 0;
+	for(int i = 0; i < n; i++){
+		if(ra[i] == n-1){
+			z = 0;
+			continue;
+		}
+
+		int j = a[ra[i]+1];
+		while(i+z < n && j+z < n && s[i+z] == s[j+z]) z++;
+		lcp[ra[i]] = z;
+		z = max(0, z-1);
+	}
+}
+
 int main(){
 	ios::sync_with_stdio(0), cin.tie(0);
 	string s;
 	cin >> s;
+	int n = s.size();
 	build_sa(s);
-	for(int i = 1; i <= s.size(); i++)
-		cout << a[i] << endl;
+	for(int i = 0; i < n; i++)
+		a[i] = a[i+1];
+
+	for(int i = 0; i < n; i++)
+		cout << a[i] << " \n"[i == n-1];
+
+	build_lcp(s);
+	for(int i = 0; i < n-1; i++)
+		cout << lcp[i] << " \n"[i == n-2];
 	return 0;
 }

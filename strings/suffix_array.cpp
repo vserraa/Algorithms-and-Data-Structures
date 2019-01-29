@@ -1,83 +1,63 @@
 #include <bits/stdc++.h>
 using namespace std;
+const int ms = 2e5+10;
+int a[ms], c[ms], a1[ms], c1[ms], head[ms], ra[ms];
 
-vector<int> build_sa(string s){
+//magic suffix array by Andrew Stankevich O(nlogn)
+void build_sa(string s){
+	s += "$";
 	int n = s.size();
-	vector<int> p(n), c(n);
-	vector<pair<int, int>> order(n);
-	for(int i = 0; i < n; i++)
-		p[i] = i;
 
-	sort(p.begin(), p.end(), [&](int i, int j) -> bool {
+	for(int i = 0; i < n; i++)
+		a[i] = i;
+	sort(a, a+n, [&](int i, int j){
 		return s[i] < s[j];
 	});
 
-	int classes = 0;
+	int cc = 0;
 	for(int i = 0; i < n; i++){
-		if(i && s[p[i]] != s[p[i-1]]) classes++;
-		c[p[i]] = classes;
+		if(i == 0 || s[a[i]] != s[a[i-1]]){
+			head[cc] = i;
+			c[a[i]] = cc++;
+		}
+		else c[a[i]] = c[a[i-1]];
 	}
 
-
-	for(int stp = 1; stp <= n; stp <<= 1){
+	int lo = 1;
+	for(; lo < n; lo <<= 1){
+		//sort pelo segundo elemento inplace nas cores
 		for(int i = 0; i < n; i++){
-			order[i].first = c[i];
-			order[i].second = (i+stp<n)?c[i+stp]:-1; //se quiser cyclic shifts pega (i+stp)%n
+			//olho primeiro na ordem do sa pro segundo elemento do par e coloco 
+			//o elemento que tem esse menor segundo elemento no inicio da cor dele
+			int j = (a[i]-lo+n)%n;
+			a1[head[c[j]]++] = j;
 		}
 
-		sort(p.begin(), p.end(), [&](int i, int j) -> bool {
-			return order[i] < order[j];
-		});	
-
-		classes = 0;
+		cc = 0;
+		//aqui faz sort pelo primeiro e prepara a proxima iteracao
 		for(int i = 0; i < n; i++){
-			if(i && order[p[i]] != order[p[i-1]]) classes++;
-			c[p[i]] = classes;
-		}
-	}
-
-	return p;
-}
-
-vector<int> build_lcp(string s, vector<int> &sa){
-	int n = s.size(), k = 0;
-	vector<int> rank(n), lcp(n-1);
-	for(int i = 0; i < n; i++)
-		rank[sa[i]] = i;
-
-	for(int i = 0; i < n; i++){
-		if(rank[i] == n-1){
-			k = 0; 
-			continue;
+			//verficia se precisa mudar a cor ou mantem a cor do ultimo cara
+			if(i == 0 || c[a1[i]] != c[a1[i-1]] || c[(a1[i]+lo)%n] != c[(a1[i-1]+lo)%n]){
+				head[cc] = i;
+				c1[a1[i]] = cc++;
+			}
+			else{
+				c1[a1[i]] = c1[a1[i-1]];
+			}
 		}
 
-		int j = sa[rank[i]+1];
-		while(i+k < n && j+k < n && s[i+k] == s[j+k]) k++;
-
-		lcp[rank[i]] = k;
-		if(k) k--;
+		//so copiando pra n cagar no meio da iteracao
+		for(int i = 0; i < n; i++)
+			a[i] = a1[i], c[i] = c1[i];
 	}
-
-	return lcp;
 }
 
 int main(){
 	ios::sync_with_stdio(0), cin.tie(0);
 	string s;
 	cin >> s;
-	int n = s.size();
-
-	vector<int> sa = build_sa(s);
-
-	for(int i = 0; i < n; i++)
-		cout << sa[i] << " \n"[i == n-1];
-
-	vector<int> lcp = build_lcp(s, sa);
-	for(int i = 0; i < n-1; i++)
-		cout << lcp[i] << " \n"[i == n-2];
-
-	/*sejam i e j duas posições nao necessariamente 
-	adjacentes no suffix array já ordenado, então 
-	LCP(i, j) = min(lcp[i], lcp[i+1], ..., lcp[j-1])*/
+	build_sa(s);
+	for(int i = 1; i <= s.size(); i++)
+		cout << a[i] << endl;
 	return 0;
 }

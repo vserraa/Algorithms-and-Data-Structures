@@ -1,47 +1,39 @@
 #include <bits/stdc++.h>
 using namespace std;
-typedef long long ll;
-const int inf = 0x3f3f3f3f;
-const int ms = 1e5+10;
-int a[ms], spt[ms][20], n;
+const int ms = (1<<20);
+int n, a[ms], lg[ms], st[20][ms];
 
-void pre(){
+void build(){
 	for(int i = 0; i < n; i++)
-		spt[i][0] = i;
-
-	for(int j = 1; (1<<j) <= n; j++)
-		for(int i = 0; i+(1<<j)-1 < n; i++){
-			if(a[spt[i][j-1]] < a[spt[i+(1<<(j-1))][j-1]])
-				spt[i][j] = spt[i][j-1];
-			else
-				spt[i][j] = spt[i+(1<<(j-1))][j-1];
+		st[0][i] = a[i];
+	for(int i = 1; i < 20; i++)
+		for(int j = 0; j+(1<<i) <= n; j++){
+			st[i][j] = min(st[i-1][j], st[i-1][j+(1<<(i-1))]);
 		}
 }
 
 int rmq(int l, int r){
-	int ans = inf;
-	for(int j = 19; j >= 0; j--){
-		if(l + (1<<j) - 1 <= r){
-			ans = min(ans, a[spt[l][j]]);
-			l += 1<<j;
-		}
-	}
-	return ans;
+	int tam = r-l+1;
+	return min(st[lg[tam]][l], st[lg[tam]][r-(1<<lg[tam])+1]);
 }
 
-//the fointowing code solves SPOJ'S RMQSQ
 int main(){
+	ios::sync_with_stdio(0), cin.tie(0);
 	cin >> n;
+	lg[1] = 0;
+	for(int i = 2; i < ms; i++)
+		lg[i] = lg[i/2]+1;
+
 	for(int i = 0; i < n; i++)
-		scanf("%d", a+i);
-	
-	pre();
+		cin >> a[i];
+
+	build();
 	int q;
 	cin >> q;
 	while(q--){
 		int l, r;
-		scanf("%d%d", &l, &r);
-		printf("%d\n", rmq(l, r));
+		cin >> l >> r;
+		cout << rmq(l, r) << endl;
 	}
 
 	return 0;

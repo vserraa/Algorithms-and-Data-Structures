@@ -9,16 +9,13 @@ ll cpp[N];
 
 void calc_sieve() {
     phi[1] = 1;
-    for (int i = 2; i <= N; ++i)
-    {
-        if (lp[i] == 0)
-        {
+    for (int i = 2; i <= N; ++i) {
+        if (lp[i] == 0) {
             lp[i] = i;
             phi[i] = i - 1;
             pr.push_back(i);
         }
-        else
-        {
+        else {
             if (lp[i] == lp[i / lp[i]])
                 phi[i] = phi[i / lp[i]] * lp[i];
             else
@@ -29,7 +26,7 @@ void calc_sieve() {
     }
 }
 
-int main(){
+int main() {
 	calc_sieve();
 	return 0;
 }

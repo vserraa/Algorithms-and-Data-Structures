@@ -54,7 +54,7 @@ struct Treap {
 			t = it;
 		}
 		else if(it->prior > t->prior) {
-			split(t, it->key, it->l, it->r);
+			split(t, it->key, it->l, it->r), t = it;
 		}
 		else {
 			insert((it->key < t->key) ? t->l : t->r, it);

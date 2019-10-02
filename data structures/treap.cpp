@@ -23,7 +23,11 @@ struct Treap {
 		if(!t) {
 			l = r = NULL;
 		}
-		else if(x < t->key) {
+		else if(x <= t->key) {
+			//quando coloca <= tudo que for MENOR vai pra t1
+			//e tudo que for MAIOR OU IGUAL vai pra t2
+			//se trocar pra < tudo que for MENOR OU IGUAL vai pra t1
+			//e tudo que for MAIOR vai pra t2
 			split(t->l, x, l, t->l), r = t;
 		}
 		else {

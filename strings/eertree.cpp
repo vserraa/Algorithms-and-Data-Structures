@@ -72,7 +72,7 @@ struct Eertree {
  
         Node new_node(size+2, nodes[cur].len+2, -1);
         nodes[cur].to[c-'a'] = nxt;
-        occAsMax.push_back(1);
+        occAsMax.push_back(0);
         lsp = nxt++;
  
         if(new_node.len == 1) {
@@ -101,13 +101,18 @@ struct Eertree {
     }
 
     void build_occ() {
+        occAsMax[lsp]++;
         occ.assign(nxt, 0);
-        for(int i = nxt-1; i > 0; i--)
+
+        for(int i = nxt-1; i > 0; i--) {
             occ[i] = occAsMax[i];
-        for(int = nxt-1; i > 0; i--) 
-            occ[ nodes[i].link ] += occ[i];
+        }
+        for(int i = nxt-1; i > 0; i--) {
+            occ[nodes[i].link] += occ[i];
+        }
     }
 };
+
 
 int main() {
     ios::sync_with_stdio(0), cin.tie(0);

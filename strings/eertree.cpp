@@ -39,6 +39,8 @@ struct Eertree {
             to.assign(sigma, -1);
         };
     };
+
+    vector<int> occAsMax, occ;
     string T;
     vector<Node> nodes;
     int lsp, nxt;
@@ -46,13 +48,16 @@ struct Eertree {
     Eertree() {
         nodes.push_back(Node(-1, -1, 0));
         nodes.push_back(Node(0, 0, 0));
+        occ.assign(2, 0);
+        occAsMax.assign(2, 0);
         lsp = 0, nxt = 2;
     }
  
     int add(char c) {
         int size = T.size();
         int cur = lsp;
-              
+        occAsMax[lsp]++;
+
         while(nodes[cur].id != -1) {
             if(size-1-nodes[cur].len >= 0 && T[size -1 -nodes[cur].len] == c)
                 break;
@@ -67,6 +72,7 @@ struct Eertree {
  
         Node new_node(size+2, nodes[cur].len+2, -1);
         nodes[cur].to[c-'a'] = nxt;
+        occAsMax.push_back(1);
         lsp = nxt++;
  
         if(new_node.len == 1) {
@@ -92,6 +98,14 @@ struct Eertree {
         T.push_back(c);
  
         return 1;
+    }
+
+    void build_occ() {
+        occ.assign(nxt, 0);
+        for(int i = nxt-1; i > 0; i--)
+            occ[i] = occAsMax[i];
+        for(int = nxt-1; i > 0; i--) 
+            occ[ nodes[i].link ] += occ[i];
     }
 };
 

@@ -3,7 +3,7 @@
 
 . a is modular inverse of x mod n
 
-. You can compute a using extended euclides algorithm by computing extended_gcd(a, n)
+. You can compute a using extended euclides algorithm by computing extended_gcd(x, n)
 
 ## How to solve a.x = b mod n
 
